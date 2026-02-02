@@ -1,5 +1,7 @@
 
-# 接口设计文档（API Spec）
+# 接口设计文档（API Spec）V1.0
+
+> 版本：1.0
 
 ## 1.1 AccountManager 接口
 

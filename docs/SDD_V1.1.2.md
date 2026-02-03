@@ -143,7 +143,7 @@ V1.1.2 口径约定：
 
 * **内存管理**：
 
-  * 成交记录存储在 `std::vector` 中，由容器管理内存。
+  * 交易记录由 `HistoryManager` 内部的 `unordered_map<TradeId, Trade>` 保存，并通过 `unordered_map<AccountId, vector<TradeId>>` 建索引用于按用户查询。
 
 ### 1.4 内存管理
 

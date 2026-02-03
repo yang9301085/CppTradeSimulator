@@ -1,13 +1,13 @@
-﻿# 接口设计文档（API Spec）V1.1
+﻿# 接口设计文档（API Spec）V1.1.1
 
-> 版本：1.1
+> 版本：1.1.1
 
 ## 0. 口径约定
 
 * 金额统一使用 `Money`（以分为单位，`long long` 存储）。
 * 数量统一使用 `std::int64_t qty`。
 * 模块划分与 `trade_sim` 目录一致：`common` / `model` / `order` / `core` / `io`。
-* V1.1 为单进程内存版，持久化仅 CSV 文件读写；不包含并发、网络、数据库。
+* V1.1.1 为单进程内存版，持久化仅 CSV 文件读写；不包含并发、网络、数据库。
 
 ## 1. common 类型约定
 
@@ -16,6 +16,7 @@
 - **描述**：金额类型，内部以分为单位存储。
 - **构造**：`Money(long long cents)`
 - **转换**：`static Money FromYuan(double yuan)`
+- **舍入**：`cents = llround(yuan * 100.0)`（四舍五入，远离 0）
 
 ### 1.2 基础类型与枚举
 
@@ -28,6 +29,7 @@
 - **通用异常**：`InvalidArgumentException` / `NotFoundException` / `InsufficientFundsException`
 - **IO/解析异常**：`IOErrorException` / `ParseErrorException`
 - **统一错误码**：`TradeSimException(ErrorCode::Duplicate / InvalidState / InsufficientPosition)`
+- **持仓不足**：`Account::addPosition` 抛 `TradeSimException(ErrorCode::InsufficientPosition, ...)`
 
 ## 2. model 模块
 
@@ -65,11 +67,12 @@
 ### 4.1 AccountManager
 
 - **签名**：
-  - `void createAccount(const std::string& userId, Money initialBalance)`
-  - `Account& getAccount(const std::string& userId)` / `const Account& getAccount(const std::string& userId) const`
-  - `bool exists(const std::string& userId) const`
+  - `void createAccount(const AccountId& id, Money initial)`
+  - `Account& getAccount(const AccountId& id)` / `const Account& getAccount(const AccountId& id) const`
+  - `bool exists(const AccountId& id) const`
   - `void loadFromFile(const std::string& path)`
   - `void saveToFile(const std::string& path) const`
+- **路径规则**：`path` 视为目录，固定文件名为 `accounts.csv` / `positions.csv`
 - **异常**：`InvalidArgumentException` / `NotFoundException` / `TradeSimException(ErrorCode::Duplicate)` / `IOErrorException` / `ParseErrorException`
 
 ### 4.2 OrderManager
@@ -99,6 +102,7 @@
   - `std::vector<Trade> historyOf(const AccountId& user) const`
   - `void loadFromFile(const std::string& path)`
   - `void saveToFile(const std::string& path) const`
+- **路径规则**：`path` 视为目录，固定文件名为 `trades.csv`
 - **异常**：`IOErrorException` / `ParseErrorException`
 
 ## 5. io 模块
@@ -109,4 +113,5 @@
   - `std::vector<std::string> readAllLines(const std::string& path)`
   - `void writeAllLines(const std::string& path, const std::vector<std::string>& lines)`
 - **异常**：`IOErrorException`
+
 

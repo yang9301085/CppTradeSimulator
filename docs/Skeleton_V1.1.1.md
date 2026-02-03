@@ -1,12 +1,12 @@
 ﻿# C++ 金融交易模拟系统代码骨架
 
-> 版本：1.1
+> 版本：1.1.1
 
-## V1.1 口径约定
+## V1.1.1 口径约定
 
 - 金额统一使用 `Money`（以分为单位，`long long` 存储），数量统一使用 `std::int64_t qty`。
-- 模块划分与目录一致：`common` / `model` / `order` / `core` / `io`，V1.1 不提供单独的 `AssetManager`。
-- V1.1 为单进程内存版，持久化仅 CSV 文件读写；不包含并发、网络、数据库。
+- 模块划分与目录一致：`common` / `model` / `order` / `core` / `io`，V1.1.1 不提供单独的 `AssetManager`。
+- V1.1.1 为单进程内存版，持久化仅 CSV 文件读写；不包含并发、网络、数据库。
 
 ## 目录结构建议
 
@@ -116,7 +116,7 @@ public:
     Money() = default;
     explicit Money(long long cents) : cents_(cents) {}
 
-    static Money FromYuan(double yuan); // TODO：实现转换与舍入策略
+    static Money FromYuan(double yuan); // cents = llround(yuan * 100.0)
     long long cents() const noexcept { return cents_; }
 
     // 运算符重载（训练点）
@@ -257,7 +257,7 @@ public:
     void withdraw(const Money& amount); // 不足抛 InsufficientFundsException
 
     std::int64_t positionOf(const Symbol& sym) const;
-    void addPosition(const Symbol& sym, std::int64_t deltaQty); // 不足抛异常
+    void addPosition(const Symbol& sym, std::int64_t deltaQty); // throws TradeSimException(ErrorCode::InsufficientPosition, ...)
 
 private:
     AccountId id_;
@@ -665,12 +665,12 @@ bool AccountManager::exists(const AccountId& id) const noexcept {
 }
 
 void AccountManager::loadFromFile(const std::string& path) {
-    // TODO：解析 accounts.csv + positions.csv（你可以拆两个文件，也可以一个文件里带 section）
+    // TODO: parse accounts.csv + positions.csv (path is a directory, fixed filenames)
     (void)path;
 }
 
 void AccountManager::saveToFile(const std::string& path) const {
-    // TODO：写 accounts.csv + positions.csv
+    // TODO: write accounts.csv + positions.csv (path is a directory, fixed filenames)
     (void)path;
 }
 
@@ -784,12 +784,12 @@ std::vector<Trade> HistoryManager::historyOf(const AccountId& user) const {
 }
 
 void HistoryManager::loadFromFile(const std::string& path) {
-    // TODO：读 trades.csv 并重建 index_
+    // TODO: read trades.csv and rebuild index_ (path is a directory, fixed filename)
     (void)path;
 }
 
 void HistoryManager::saveToFile(const std::string& path) const {
-    // TODO：写 trades.csv
+    // TODO: write trades.csv (path is a directory, fixed filename)
     (void)path;
 }
 

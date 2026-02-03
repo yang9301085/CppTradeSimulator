@@ -1,6 +1,6 @@
 ﻿# **金融交易模拟系统**详细设计说明书（SDD/LLD）
 
-> 版本：1.1
+> 版本：1.1.1
 
 ---
 
@@ -10,11 +10,11 @@
 
 金融交易模拟系统旨在模拟一个金融平台，支持用户的交易操作，包括股票、期货等资产的买卖。系统提供账户管理、订单管理、撮合执行、历史查询等功能，并支持限价单、市场单等订单类型。
 
-V1.1 口径约定：
+V1.1.1 口径约定：
 
 * 金额统一使用 `Money`（以分为单位，`long long` 存储），数量统一使用 `std::int64_t qty`。
 * 模块划分与 `trade_sim` 目录一致：`common` / `model` / `order` / `core` / `io`。
-* V1.1 为单进程内存版，持久化仅 CSV 文件读写；不包含并发、网络、数据库。
+* V1.1.1 为单进程内存版，持久化仅 CSV 文件读写；不包含并发、网络、数据库。
 
 ### 1.2 模块设计
 
@@ -27,11 +27,11 @@ V1.1 口径约定：
   * `AccountManager` 类：管理账户集合。
 * **接口设计**：
 
-  * `createAccount(const std::string& userId, Money initialBalance)`: 创建账户。
-  * `getAccount(const std::string& userId)`: 获取账户（可提供 const/非 const 重载）。
-  * `bool exists(const std::string& userId) const`: 判断账户是否存在。
-  * `loadFromFile(const std::string& path)`: 从 CSV 载入账户与持仓。
-  * `saveToFile(const std::string& path) const`: 保存账户与持仓到 CSV。
+  * `createAccount(const AccountId& id, Money initial)`: 创建账户。
+  * `getAccount(const AccountId& id)`: 获取账户（可提供 const/非 const 重载）。
+  * `bool exists(const AccountId& id) const`: 判断账户是否存在。
+  * `loadFromFile(const std::string& path)`: 从 CSV 载入账户与持仓（`path` 视为目录，固定文件名为 `accounts.csv` / `positions.csv`）。
+  * `saveToFile(const std::string& path) const`: 保存账户与持仓到 CSV（同上）。
 
 #### 1.2.2 订单管理模块（OrderManager）
 
@@ -80,8 +80,8 @@ V1.1 口径约定：
 
   * `record(const Trade& t, const AccountId& buyer, const AccountId& seller)`: 记录成交。
   * `std::vector<Trade> historyOf(const AccountId& user) const`: 查询用户历史。
-  * `loadFromFile(const std::string& path)`: 从 CSV 载入成交记录。
-  * `saveToFile(const std::string& path) const`: 保存成交记录到 CSV。
+  * `loadFromFile(const std::string& path)`: 从 CSV 载入成交记录（`path` 视为目录，固定文件名为 `trades.csv`）。
+  * `saveToFile(const std::string& path) const`: 保存成交记录到 CSV（同上）。
 
 #### 1.2.6 文件存储模块（Storage）
 
@@ -96,6 +96,7 @@ V1.1 口径约定：
 #### 1.3.1 Money 与 Position
 
 * **Money**：以分为单位的金额类型，内部使用 `long long` 存储。
+* **FromYuan**：`cents = llround(yuan * 100.0)`（四舍五入，远离 0）。
 * **Position**：持仓结构，包含 `symbol` 与 `std::int64_t qty`。
 
 #### 1.3.2 Account 类
@@ -153,12 +154,13 @@ V1.1 口径约定：
 * **资源未找到**：抛出 `NotFoundException`。
 * **重复资源**：抛出 `TradeSimException(ErrorCode::Duplicate)`。
 * **资金不足**：抛出 `InsufficientFundsException`。
+* **持仓不足**：`Account::addPosition` 抛 `TradeSimException(ErrorCode::InsufficientPosition, ...)`。
 * **IO 与解析错误**：抛出 `IOErrorException` / `ParseErrorException`。
 * **非法状态**：抛出 `TradeSimException(ErrorCode::InvalidState)`。
 
 ---
 
-### 1.6 未来扩展（V1.1 不包含）
+### 1.6 未来扩展（V1.1.1 不包含）
 
 * **并发与线程安全**：多线程撮合、锁与一致性保证。
 * **网络与远程接口**：服务化、RPC/HTTP 接入。

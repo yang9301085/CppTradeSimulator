@@ -153,7 +153,7 @@
 - **签名**：`void submitRaw(Order* rawOrder)`
 - **参数约束**：`rawOrder` 非空。
 - **异常安全**：强保证。
-- **所有权**：成功后由 `OrderManager` 接管；失败时调用方仍拥有所有权。
+- **所有权**：函数开始即接管所有权；若提交失败，`rawOrder` 在栈展开时被销毁，不再回到调用方。
 
 #### 4.2.4 get
 
@@ -192,7 +192,7 @@
 - **签名**：`void submitAndProcess(std::unique_ptr<Order> order)`
 - **参数约束**：`order` 非空；订单参数合法。
 - **异常安全**：基本保证（可能部分更新订单/账户/历史）。
-- **所有权**：成功后订单归 `OrderManager` 持有；失败时所有权可能已转移。
+- **所有权**：调用时即转移所有权；若 `OrderManager::submit` 成功，订单归 `OrderManager` 持有；若在提交前抛异常，订单在栈展开时被销毁。
 
 ### 4.5 HistoryManager
 

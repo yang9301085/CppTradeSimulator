@@ -3,6 +3,7 @@
 ## 1.2
 
 - APISpec 训练版：逐接口补充参数约束、异常安全承诺、所有权约定
+- 修正 submitRaw / submitAndProcess 的所有权说明
 
 ## 1.1.2
 

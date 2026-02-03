@@ -2,9 +2,9 @@
 
 ## 文档索引
 
-- `APISpec_V1.1.md`：接口设计文档（API Spec）
-- `SDD_V1.1.md`：详细设计说明书（SDD / LLD）
-- `Skeleton_V1.1.md`：代码骨架与目录结构
+- `docs/APISpec_V1.1.md`：接口设计文档（API Spec）
+- `docs/SDD_V1.1.md`：详细设计说明书（SDD / LLD）
+- `docs/Skeleton_V1.1.md`：代码骨架与目录结构
 
 ## 系统功能
 

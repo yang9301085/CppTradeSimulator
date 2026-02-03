@@ -9,6 +9,31 @@
 * 模块划分与 `trade_sim` 目录一致：`common` / `model` / `order` / `core` / `io`。
 * V1.2 为单进程内存版，持久化仅 CSV 文件读写；不包含并发、网络、数据库。
 
+## 0.1 实现硬约束（必须遵循）
+
+### 0.1.1 金额与数量
+
+- `Money` 使用分的整型封装，不使用 `double` 作为余额/价格。
+- 数量统一使用 `std::int64_t`（持仓/下单 `qty`）。
+
+### 0.1.2 CSV 规范
+
+- 无 header
+- 允许空行
+- 不支持转义（逗号即分隔符）
+- 任一行解析失败：整文件失败并抛 `ParseErrorException`
+
+### 0.1.3 path 语义
+
+- `loadFromFile(path)` / `saveToFile(path)` 中的 `path` 为目录
+- 文件名固定为 `accounts.csv` / `positions.csv` / `trades.csv`
+
+### 0.1.4 所有权
+
+- `OrderManager::submit(std::unique_ptr<Order>)`：调用时即转移所有权；失败时对象在栈展开中析构，不会还给调用方
+- `OrderManager::submitRaw(Order*)`：调用即接管；失败同样会析构（调用方不再 `delete`）
+- `OrderFactory::createXXXRaw()`：返回裸指针，必须配套 `destroyRaw()` 或 `delete`（训练点）
+
 ## 1. common 类型约定
 
 ### 1.1 Money

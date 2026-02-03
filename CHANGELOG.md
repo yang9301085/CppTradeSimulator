@@ -6,6 +6,8 @@
 - 修正 submitRaw / submitAndProcess 的所有权说明
 - 修正 submit 的所有权说明
 - 统一 SDD / Skeleton 基线版本号到 1.2
+- APISpec 增补“实现硬约束”摘要
+- Skeleton 明确 CSV 解析硬约束
 
 ## 1.1.2
 

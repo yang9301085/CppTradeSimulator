@@ -580,10 +580,15 @@ namespace trade_sim {
 
 /**
  * Storage：集中放简单文件读写工具
- * 文件格式建议（先别搞 JSON，练解析就用 CSV）：
+ * 文件格式（硬约束）：
  * - accounts.csv：accountId,balanceCents
  * - positions.csv：accountId,symbol,qty
  * - trades.csv：tradeId,buyOrderId,sellOrderId,symbol,qty,priceCents
+ * 规则：
+ * - 无 header
+ * - 允许空行
+ * - 不支持转义（逗号即分隔符）
+ * - 任一行解析失败：整文件失败并抛 ParseErrorException
  */
 class Storage {
 public:

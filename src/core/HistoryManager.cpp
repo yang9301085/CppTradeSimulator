@@ -6,3 +6,5 @@
  * - Provide filters for time, account, and symbol.
  * - No implementation code in this skeleton.
  */
+#include "trade_sim/core/HistoryManager.h"
+// TODO: implement

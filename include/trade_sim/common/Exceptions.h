@@ -6,3 +6,8 @@
  * - Keep exception types focused and descriptive.
  * - No implementation code in this skeleton.
  */
+#pragma once
+
+namespace trade_sim {
+// TODO: declarations
+}

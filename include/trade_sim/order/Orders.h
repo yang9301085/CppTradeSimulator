@@ -6,3 +6,8 @@
  * - Document ordering rules (price-time priority).
  * - No implementation code in this skeleton.
  */
+#pragma once
+#include "trade_sim/order/Order.h"
+namespace trade_sim {
+// TODO: declarations
+}

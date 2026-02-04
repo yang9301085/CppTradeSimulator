@@ -6,3 +6,8 @@
  * - Define interfaces for debits/credits and position updates.
  * - No implementation code in this skeleton.
  */
+#pragma once
+
+namespace trade_sim {
+// TODO: declarations
+}

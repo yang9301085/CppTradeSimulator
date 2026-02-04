@@ -6,3 +6,9 @@
  * - Cover a minimal happy-path trade flow.
  * - No implementation code in this skeleton.
  */
+#include <iostream>
+
+int main() {
+    std::cout << "[OK] smoke_test: hello\n";
+    return 0;
+}

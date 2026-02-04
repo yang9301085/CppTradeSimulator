@@ -6,3 +6,8 @@
  * - Define identifiers, enums, and value types (e.g., Money) here.
  * - No implementation code in this skeleton.
  */
+#pragma once
+
+namespace trade_sim {
+// TODO: declarations
+}

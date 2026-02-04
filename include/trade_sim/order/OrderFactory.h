@@ -6,3 +6,8 @@
  * - Provide a single creation path for all order types.
  * - No implementation code in this skeleton.
  */
+#pragma once
+#include "trade_sim/order/Order.h"
+namespace trade_sim {
+// TODO: declarations
+}

@@ -6,3 +6,5 @@
  * - Generate trade events for execution.
  * - No implementation code in this skeleton.
  */
+#include "trade_sim/core/MatchingEngine.h"
+// TODO: implement

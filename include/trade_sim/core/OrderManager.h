@@ -6,3 +6,11 @@
  * - Maintain order lookup indexes.
  * - No implementation code in this skeleton.
  */
+#pragma once
+#include "trade_sim/core/MatchingEngine.h"
+#include <vector>
+#include <unordered_map>
+
+namespace trade_sim {
+    
+}

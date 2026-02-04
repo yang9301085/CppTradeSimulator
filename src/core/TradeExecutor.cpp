@@ -6,3 +6,6 @@
  * - Record trade history and persist results.
  * - No implementation code in this skeleton.
  */
+#include "trade_sim/core/TradeExecutor.h"
+#include "trade_sim/common/Exceptions.h"
+// TODO: implement

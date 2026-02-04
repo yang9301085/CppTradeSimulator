@@ -6,3 +6,10 @@
  * - Keep serialization formats centralized.
  * - No implementation code in this skeleton.
  */
+#pragma once
+#include <string>
+#include <vector>
+
+namespace trade_sim {
+    
+}

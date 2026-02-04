@@ -6,3 +6,7 @@
  * - Handle file/database operations and errors.
  * - No implementation code in this skeleton.
  */
+
+#include "trade_sim/io/Storage.h"
+#include "trade_sim/common/Exceptions.h"
+// TODO: implement

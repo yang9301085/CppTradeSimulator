@@ -6,3 +6,8 @@
  * - Coordinate balance checks and position updates.
  * - No implementation code in this skeleton.
  */
+#pragma once
+#include "trade_sim/model/Account.h"
+namespace trade_sim {
+    
+}

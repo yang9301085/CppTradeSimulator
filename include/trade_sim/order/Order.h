@@ -6,3 +6,8 @@
  * - Document lifecycle states and invariants.
  * - No implementation code in this skeleton.
  */
+#pragma once
+
+namespace trade_sim {
+// TODO: declarations
+}

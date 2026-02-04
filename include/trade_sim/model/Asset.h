@@ -6,3 +6,8 @@
  * - Keep business invariants documented here.
  * - No implementation code in this skeleton.
  */
+#pragma once
+
+namespace trade_sim {
+// TODO: declarations
+}

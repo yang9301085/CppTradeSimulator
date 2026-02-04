@@ -1,7 +1,7 @@
-/*
- * File: include/trade_sim/order/Order.h
- * Purpose: Declare the base Order type and core fields.
- * Notes:
+/**
+ * @file include/trade_sim/order/Order.h
+ * @brief Declare the base Order type and core fields.
+ * @details
  * - Capture order identity, side, quantity, and price policy.
  * - Document lifecycle states and invariants.
  * - No implementation code in this skeleton.

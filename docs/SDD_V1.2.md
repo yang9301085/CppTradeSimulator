@@ -155,7 +155,7 @@ V1.2 口径约定：
 
 * **参数无效**：抛出 `InvalidArgumentException`。
 * **资源未找到**：抛出 `NotFoundException`。
-* **重复资源**：抛出 `TradeSimException(ErrorCode::Duplicate)`。
+* **重复资源**：抛出 `TradeSimException(ErrorCode::Duplicate, ...)`。
 * **资金不足**：抛出 `InsufficientFundsException`。
 * **持仓不足**：`Account::addPosition` 抛 `TradeSimException(ErrorCode::InsufficientPosition, ...)`。
 * **IO 与解析错误**：抛出 `IOErrorException` / `ParseErrorException`。
@@ -169,4 +169,236 @@ V1.2 口径约定：
 * **网络与远程接口**：服务化、RPC/HTTP 接入。
 * **数据库持久化**：替换 CSV，支持事务与恢复。
 * **高级撮合与订单簿**：撮合优先级、部分成交与挂单簿。
+
+## 附录 A：字段契约 Data Dictionary（V1.2）
+
+目标：让你“不懂金融也能写对”。每个字段都写死：含义 / 单位 / 范围 / 来源 / 变化时机 / 失败策略
+### A.1 基础类型与单位
+
+**Money::cents_** (`long long`)  
+含义：金额  
+单位：分  
+约束 / 不变量：可为负（用于中间计算），但**账户余额**必须 `>= 0`；价格必须 `> 0`（限价单）  
+失败策略：违规抛 `InvalidArgumentException` / `InsufficientFundsException`
+
+**qty** (`std::int64_t`)  
+含义：数量（下单/持仓/成交）  
+单位：股/份（抽象单位）  
+约束 / 不变量：V1.2 不做空：**持仓 qty 必须 `>= 0`**；订单 qty 必须 `> 0`；成交 qty 必须 `> 0`  
+失败策略：订单参数：`InvalidArgumentException`；持仓不足：`TradeSimException(ErrorCode::InsufficientPosition, ...)`
+
+---
+### A.2 标识符与枚举
+
+**AccountId** (`std::string`)  
+含义：账户标识  
+约束 / 不变量：非空  
+失败策略：空：`InvalidArgumentException`；不存在：`NotFoundException`
+
+**Symbol** (`std::string`)  
+含义：标的代码（比如 `AAPL`）  
+约束 / 不变量：非空；字段内不含逗号（CSV 规则）  
+失败策略：空：`InvalidArgumentException`
+
+**OrderId** (`uint64_t`)  
+含义：订单 ID  
+约束 / 不变量：`> 0`；在 `OrderManager` 内唯一  
+失败策略：重复：`TradeSimException(ErrorCode::Duplicate, ...)`
+
+**TradeId** (`uint64_t`)  
+含义：成交 ID  
+约束 / 不变量：`> 0`；在 `HistoryManager` 内唯一  
+失败策略：重复：`TradeSimException(ErrorCode::Duplicate, ...)`
+
+**Side** (`enum class`)  
+含义：买/卖  
+约束 / 不变量：`Buy` / `Sell`  
+失败策略：非法值（反序列化）：`ParseErrorException`
+
+**OrderKind** (`enum class`)  
+含义：市价/限价  
+约束 / 不变量：`Market` / `Limit`  
+失败策略：非法值（反序列化）：`ParseErrorException`
+
+**OrderStatus** (`enum class`)  
+含义：订单状态  
+约束 / 不变量：`Pending/PartiallyFilled/Filled/Cancelled/Rejected`  
+失败策略：非法状态转换：`TradeSimException(ErrorCode::InvalidState, ...)`
+
+---
+### A.3 struct / class 字段契约
+
+#### Position（持仓）
+
+**symbol** (`string`)  
+含义：持仓标的  
+约束 / 不变量：非空  
+何时变化：只在创建/载入时确定  
+失败策略：空：`InvalidArgumentException`；解析失败：`ParseErrorException`
+
+**qty** (`int64_t`)  
+含义：当前持仓数量  
+约束 / 不变量：`>= 0`（V1.2 不做空）  
+何时变化：结算成交时增减；载入文件  
+失败策略：减到负：`TradeSimException(ErrorCode::InsufficientPosition, ...)`
+
+#### Account（账户）
+
+**id_** (`AccountId`)  
+含义：用户 ID  
+约束 / 不变量：非空  
+何时变化：创建时确定  
+失败策略：空：`InvalidArgumentException`
+
+**balance_** (`Money`)  
+含义：现金余额  
+约束 / 不变量：`>= 0`（V1.2 不透支）  
+何时变化：`deposit/withdraw`；成交结算  
+失败策略：不足：`InsufficientFundsException`
+
+**positions_** (`map(Symbol->qty)`)  
+含义：持仓表  
+约束 / 不变量：每个 `qty >= 0`  
+何时变化：成交结算；载入文件  
+失败策略：不足：`TradeSimException(ErrorCode::InsufficientPosition, ...)`
+
+#### Order（订单层次）
+
+**id_** (`OrderId`)  
+含义：订单 ID  
+约束 / 不变量：`> 0`  
+何时变化：创建时确定  
+失败策略：重复入库：`TradeSimException(ErrorCode::Duplicate, ...)`
+
+**user_** (`AccountId`)  
+含义：下单账户  
+约束 / 不变量：非空  
+何时变化：创建时确定  
+失败策略：空：`InvalidArgumentException`
+
+**symbol_** (`Symbol`)  
+含义：标的  
+约束 / 不变量：非空  
+何时变化：创建时确定  
+失败策略：空：`InvalidArgumentException`
+
+**side_** (`Side`)  
+含义：买/卖  
+约束 / 不变量：必须是枚举合法值  
+何时变化：创建时确定  
+失败策略：非法：`InvalidArgumentException`
+
+**qty_** (`int64_t`)  
+含义：下单数量  
+约束 / 不变量：`> 0`  
+何时变化：创建时确定；（可选）撮合后剩余量变化  
+失败策略：`qty <= 0`：`InvalidArgumentException`
+
+**LimitOrder::limit_** (`Money`)  
+含义：限价  
+约束 / 不变量：`> 0`  
+何时变化：创建时确定  
+失败策略：`<= 0`：`InvalidArgumentException`
+
+#### Trade（成交）
+
+**tradeId** (`TradeId`)  
+含义：成交 ID  
+约束 / 不变量：`> 0`  
+来源：`MatchingEngine` 生成  
+失败策略：重复：`TradeSimException(ErrorCode::Duplicate, ...)`
+
+**buyOrderId** (`OrderId`)  
+含义：买单 ID  
+约束 / 不变量：`> 0`  
+来源：撮合结果  
+失败策略：订单不存在：`InvalidState`（或 `NotFound`）
+
+**sellOrderId** (`OrderId`)  
+含义：卖单 ID  
+约束 / 不变量：`> 0`  
+来源：撮合结果  
+失败策略：订单不存在：`InvalidState`（或 `NotFound`）
+
+**symbol** (`Symbol`)  
+含义：标的  
+约束 / 不变量：非空  
+来源：撮合结果  
+失败策略：空：`InvalidState`
+
+**qty** (`int64_t`)  
+含义：成交数量  
+约束 / 不变量：`> 0`  
+来源：撮合结果  
+失败策略：`<= 0`：`InvalidState`
+
+**price** (`Money`)  
+含义：成交价  
+约束 / 不变量：`> 0`  
+来源：撮合结果  
+失败策略：`<= 0`：`InvalidState`
+
+---
+### 附录 B：落盘 CSV 契约（V1.2）
+
+> path 语义：loadFromFile(path) / saveToFile(path) 的 path 是目录，文件名固定。
+> 解析规则：无 header，允许空行，不支持转义，任何一行失败整文件失败抛 ParseErrorException。
+
+| 文件              | 行格式                                                    | 字段约束                                           |
+| --------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| `accounts.csv`  | `accountId,balanceCents`                               | `accountId` 非空；`balanceCents >= 0`             |
+| `positions.csv` | `accountId,symbol,qty`                                 | `accountId` 非空；`symbol` 非空；`qty >= 0`          |
+| `trades.csv`    | `tradeId,buyOrderId,sellOrderId,symbol,qty,priceCents` | `tradeId>0`；`qty>0`；`priceCents>0`；`symbol` 非空 |
+
+### 附录 C：示例流程（Example Flows，带数字，能直接写测试）
+
+### Flow 1：最小成交结算（无手续费）
+
+初始：
+
+- u1.balance = 1000.00（100000 分）
+- u2.balance = 0.00
+- u2.positions[AAPL] = 10
+
+订单与成交：
+
+- u1 买 AAPL 3 股
+- 成交价 100.00（10000 分）
+- 成交金额 notional = qty * price = 3 * 10000 = 30000 分
+
+期望结果：
+
+- u1.balance = 100000 - 30000 = 70000 分（700.00）
+- u1.positions[AAPL] = +3
+- u2.balance = 0 + 30000 = 30000 分（300.00）
+- u2.positions[AAPL] = 10 - 3 = 7
+- HistoryManager 中 u1/u2 都能查到同一条 Trade
+
+Flow 2：资金不足（必须原子失败）
+
+初始：
+
+- u1.balance = 50.00（5000 分）
+- 想买：AAPL 1 股，成交价 100.00（10000 分）
+
+期望：
+
+- applyTradeToAccounts 抛 InsufficientFundsException
+- 账户状态不应被改一半：u1.balance 仍是 5000 分；持仓不变；历史不记录
+
+Flow 3：持仓不足（必须原子失败）
+
+初始：
+
+- u2.positions[AAPL] = 0
+- 卖出成交：AAPL 1 股
+
+期望：
+
+- 抛 TradeSimException(ErrorCode::InsufficientPosition, ...)
+- u2.balance 不增加；u1.balance 不减少；历史不记录
+
+
+---
+
 

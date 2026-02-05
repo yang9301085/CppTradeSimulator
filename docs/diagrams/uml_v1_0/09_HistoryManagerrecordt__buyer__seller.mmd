@@ -1,0 +1,19 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Buyer empty?}
+  B -- Yes --> E_Invalid[Throw InvalidArg]
+  B -- No --> C{Seller empty?}
+  C -- Yes --> E_Invalid
+  C -- No --> D{TradeId duplicate?}
+  D -- Yes --> E_Duplicate[Throw Duplicate]
+  D -- No --> E[Store trade]
+  E --> F[Append index buyer]
+  F --> G[Append index seller]
+  G --> Z([End])
+  E_Invalid --> Z
+  E_Duplicate --> Z
+
+  class E_Invalid,E_Duplicate err
+  class Z ok

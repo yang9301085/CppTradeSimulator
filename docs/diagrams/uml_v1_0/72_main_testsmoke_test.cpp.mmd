@@ -1,0 +1,17 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B[Create AccountManager]
+  B --> C[Create account u1]
+  C --> D[Assert exists]
+  D --> E[Try getAccount missing]
+  E --> F{NotFound thrown?}
+  F -- Yes --> G[Assert true]
+  F -- No --> H[Assert false]
+  G --> I[Return 0]
+  H --> I
+  I --> Z([End])
+
+  class H err
+  class Z ok

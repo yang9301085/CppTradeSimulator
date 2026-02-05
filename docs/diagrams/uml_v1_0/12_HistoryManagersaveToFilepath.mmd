@@ -1,0 +1,13 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B[Build lines trades]
+  B --> C[Write trades file]
+  C --> D{IO fail?}
+  D -- Yes --> E_IO[Throw IOError]
+  D -- No --> Z([End])
+  E_IO --> Z
+
+  class E_IO err
+  class Z ok

@@ -1,0 +1,8 @@
+flowchart TD
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B[Write cents_ to stream]
+  B --> C[Return stream]
+  C --> Z([End])
+
+  class Z ok

@@ -1,0 +1,149 @@
+classDiagram
+  direction LR
+
+  class Money {
+    - long long cents_
+    + Money()
+    + Money(long long)
+    + static Money FromYuan(double)
+    + long long cents() const
+    + operator+()
+    + operator-()
+    + operator+=()
+    + operator-=()
+    + operator<()
+    + operator==()
+  }
+
+  class Position {
+    + string symbol
+    + int64 qty
+  }
+
+  class Account {
+    - AccountId id_
+    - Money balance_
+    - unordered_map~Symbol,int64~ positions_
+    + Account(AccountId, Money)
+    + const AccountId& id() const
+    + Money balance() const
+    + void deposit(Money)
+    + void deposit(long long)
+    + void withdraw(Money)
+    + int64 positionOf(Symbol) const
+    + void addPosition(Symbol, int64)
+  }
+
+  class Order {
+    <<abstract>>
+    # OrderId id_
+    # AccountId user_
+    # Symbol symbol_
+    # Side side_
+    # int64 qty_
+    + virtual ~Order()
+    + OrderId id() const
+    + const AccountId& user() const
+    + const Symbol& symbol() const
+    + Side side() const
+    + int64 qty() const
+    + OrderKind kind() const*
+    + Money limitPrice() const*
+    + Order* cloneRaw() const*
+  }
+
+  class MarketOrder {
+    + OrderKind kind() const
+    + Money limitPrice() const
+    + Order* cloneRaw() const
+  }
+
+  class LimitOrder {
+    - Money limit_
+    + OrderKind kind() const
+    + Money limitPrice() const
+    + Order* cloneRaw() const
+  }
+
+  class OrderFactory {
+    + static Order* createMarketOrderRaw(...)
+    + static Order* createLimitOrderRaw(...)
+    + static void destroyRaw(Order*) noexcept
+    + static unique_ptr~Order~ createMarketOrder(...)
+    + static unique_ptr~Order~ createLimitOrder(...)
+  }
+
+  class OrderManager {
+    - OrderId next_
+    - unordered_map~OrderId,unique_ptr~Order~~ orders_
+    - unordered_map~OrderId,OrderStatus~ status_
+    + OrderId nextId()
+    + void submit(unique_ptr~Order~)
+    + void submitRaw(Order*)
+    + Order& get(OrderId)
+    + OrderStatus status(OrderId) const
+    + void cancel(OrderId)
+  }
+
+  class Trade {
+    + TradeId tradeId
+    + OrderId buyOrderId
+    + OrderId sellOrderId
+    + Symbol symbol
+    + int64 qty
+    + Money price
+  }
+
+  class MatchingEngine {
+    - TradeId nextTradeId_
+    + vector~Trade~ match(const Order&)
+  }
+
+  class HistoryManager {
+    - unordered_map~TradeId,Trade~ trades_
+    - unordered_map~AccountId,vector~TradeId~~ index_
+    + void record(const Trade&, const AccountId&, const AccountId&)
+    + vector~Trade~ historyOf(const AccountId&) const
+    + void loadFromFile(string)
+    + void saveToFile(string) const
+  }
+
+  class AccountManager {
+    - unordered_map~AccountId,Account~ accounts_
+    + void createAccount(AccountId, Money)
+    + Account& getAccount(AccountId)
+    + bool exists(AccountId) const
+    + void loadFromFile(string)
+    + void saveToFile(string) const
+  }
+
+  class Storage {
+    + static vector~string~ readAllLines(string)
+    + static void writeAllLines(string, vector~string~)
+  }
+
+  class TradeExecutor {
+    - AccountManager& accounts_
+    - OrderManager& orders_
+    - MatchingEngine& engine_
+    - HistoryManager& history_
+    + void submitAndProcess(unique_ptr~Order~)
+    - void applyTradeToAccounts(const Trade&)
+  }
+
+  Money <.. Account : uses
+  Position <.. Account : concept
+  Order <|-- MarketOrder
+  Order <|-- LimitOrder
+  OrderFactory ..> Order : creates
+  OrderManager o-- Order : owns(unique_ptr)
+  MatchingEngine ..> Order : reads
+  MatchingEngine --> Trade : produces
+  HistoryManager o-- Trade : stores
+  AccountManager o-- Account : stores
+  TradeExecutor --> AccountManager
+  TradeExecutor --> OrderManager
+  TradeExecutor --> MatchingEngine
+  TradeExecutor --> HistoryManager
+  AccountManager ..> Storage
+  HistoryManager ..> Storage

@@ -1,0 +1,16 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Finite?}
+  B -- No --> E_Invalid[Throw InvalidArg]
+  B -- Yes --> C[Mul 100]
+  C --> D[Round]
+  D --> E{In range?}
+  E -- No --> E_Invalid
+  E -- Yes --> F[Make Money]
+  F --> Z([End])
+  E_Invalid --> Z
+
+  class E_Invalid err
+  class Z ok

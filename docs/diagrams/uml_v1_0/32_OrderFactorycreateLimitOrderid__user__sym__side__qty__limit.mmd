@@ -1,0 +1,14 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B[Call createRaw]
+  B --> C{Throw?}
+  C -- Yes --> E_Throw[Propagate]
+  C -- No --> D[Wrap unique]
+  D --> E[Return obj]
+  E --> Z([End])
+  E_Throw --> Z
+
+  class E_Throw err
+  class Z ok

@@ -1,0 +1,17 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Id empty?}
+  B -- Yes --> E_Invalid[Throw InvalidArg]
+  B -- No --> C{Initial < 0?}
+  C -- Yes --> E_Invalid
+  C -- No --> D{Exists?}
+  D -- Yes --> E_Duplicate[Throw Duplicate]
+  D -- No --> E[Insert account]
+  E --> Z([End])
+  E_Invalid --> Z
+  E_Duplicate --> Z
+
+  class E_Invalid,E_Duplicate err
+  class Z ok

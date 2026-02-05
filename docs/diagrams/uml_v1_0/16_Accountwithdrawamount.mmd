@@ -1,0 +1,15 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Amt > 0?}
+  B -- No --> E_Invalid[Throw InvalidArg]
+  B -- Yes --> C{Balance >= amt?}
+  C -- No --> E_NoFunds[Throw NoFunds]
+  C -- Yes --> D[Sub balance]
+  D --> Z([End])
+  E_Invalid --> Z
+  E_NoFunds --> Z
+
+  class E_Invalid,E_NoFunds err
+  class Z ok

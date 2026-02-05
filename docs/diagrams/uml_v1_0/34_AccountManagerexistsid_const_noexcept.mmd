@@ -1,0 +1,10 @@
+flowchart TD
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Id found?}
+  B -- Yes --> C[Return true]
+  B -- No --> D[Return false]
+  C --> Z([End])
+  D --> Z
+
+  class Z ok

@@ -1,0 +1,16 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{User empty?}
+  B -- Yes --> E_Invalid[Throw InvalidArg]
+  B -- No --> C{Has index?}
+  C -- No --> D[Return empty]
+  D --> Z([End])
+  C -- Yes --> F[Build result list]
+  F --> G[Return result]
+  G --> Z
+  E_Invalid --> Z
+
+  class E_Invalid err
+  class Z ok

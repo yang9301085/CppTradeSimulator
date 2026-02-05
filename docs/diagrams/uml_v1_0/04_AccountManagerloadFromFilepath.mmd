@@ -1,0 +1,25 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B[Build file path]
+  B --> C[Read accounts lines]
+  C --> D{IO fail?}
+  D -- Yes --> E_IO[Throw IOError]
+  D -- No --> E[Parse accounts to temp]
+  E --> F{Parse fail?}
+  F -- Yes --> E_Parse[Throw ParseError]
+  F -- No --> G[Read positions lines]
+  G --> H{IO fail?}
+  H -- Yes --> E_IO
+  H -- No --> I[Parse positions to temp]
+  I --> J{Parse fail?}
+  J -- Yes --> E_Parse
+  J -- No --> K[Apply positions to temp]
+  K --> L[Swap accounts_]
+  L --> Z([End])
+  E_IO --> Z
+  E_Parse --> Z
+
+  class E_IO,E_Parse err
+  class Z ok

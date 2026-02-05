@@ -1,0 +1,20 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Sym empty?}
+  B -- Yes --> E_Invalid[Throw InvalidArg]
+  B -- No --> C[Get cur]
+  C --> D[Calc new]
+  D --> E{New >= 0?}
+  E -- No --> E_NoPos[Throw NoPos]
+  E -- Yes --> F{New == 0?}
+  F -- Yes --> G[Erase key]
+  F -- No --> H[Set qty]
+  G --> Z([End])
+  H --> Z
+  E_Invalid --> Z
+  E_NoPos --> Z
+
+  class E_Invalid,E_NoPos err
+  class Z ok

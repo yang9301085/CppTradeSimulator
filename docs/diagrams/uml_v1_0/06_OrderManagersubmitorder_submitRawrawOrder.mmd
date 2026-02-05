@@ -1,0 +1,22 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Raw path?}
+  B -- Yes --> C{Raw null?}
+  C -- Yes --> E_Invalid[Throw InvalidArg]
+  C -- No --> D[Wrap to owning ptr]
+  D --> S[Call submit]
+  B -- No --> S
+  S --> F{Order null?}
+  F -- Yes --> E_Invalid
+  F -- No --> G{Id duplicate?}
+  G -- Yes --> E_Duplicate[Throw Duplicate]
+  G -- No --> H[Store order]
+  H --> I[Set status Pending]
+  I --> Z([End])
+  E_Invalid --> Z
+  E_Duplicate --> Z
+
+  class E_Invalid,E_Duplicate err
+  class Z ok

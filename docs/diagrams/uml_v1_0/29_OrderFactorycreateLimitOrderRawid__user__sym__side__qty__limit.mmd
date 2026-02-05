@@ -1,0 +1,23 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{User empty?}
+  B -- Yes --> E_Invalid[Throw InvalidArg]
+  B -- No --> C{Sym empty?}
+  C -- Yes --> E_Invalid
+  C -- No --> D{Qty > 0?}
+  D -- No --> E_Invalid
+  D -- Yes --> E{Limit > 0?}
+  E -- No --> E_Invalid
+  E -- Yes --> F[New LimitOrder]
+  F --> G{Alloc ok?}
+  G -- No --> E_BadAlloc[Throw BadAlloc]
+  G -- Yes --> H[Init fields]
+  H --> I[Return raw]
+  I --> Z([End])
+  E_Invalid --> Z
+  E_BadAlloc --> Z
+
+  class E_Invalid,E_BadAlloc err
+  class Z ok

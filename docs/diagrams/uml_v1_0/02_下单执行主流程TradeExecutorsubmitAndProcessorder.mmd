@@ -1,0 +1,34 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{"order == nullptr?"}
+  B -- Yes --> E_InvalidArg["抛InvalidArgumentException"]
+  B -- No --> C["OrderManager.submit(std::move(order))"]
+  C --> D{"submit 失败? 重复 ID / 参数非法"}
+  D -- Yes --> E_SubmitFail["抛Duplicate / InvalidArgumentException"]
+  D -- No --> F["ref = OrderManager.get(oid)"]
+  F --> G["trades = MatchingEngine.match(ref)"]
+  G --> H{"trades 为空?"}
+  H -- Yes --> I["订单保持 Pending"]
+  H -- No --> T{"Has next trade?"}
+  T -- No --> Q["更新订单状态: Filled/PartiallyFilled"]
+  T -- Yes --> K["校验 t: qty>0, price>0, symbol 非空"]
+  K --> L{"校验失败?"}
+  L -- Yes --> E_InvalidState["抛InvalidState"]
+  L -- No --> M["applyTradeToAccounts(t)"]
+  M --> N{"资金不足 / 持仓不足?"}
+  N -- Yes --> E_Insufficient["抛InsufficientFunds / InsufficientPosition"]
+  N -- No --> O["确定 buyer/seller: 通过 buyOrderId/sellOrderId 查 OrderManager.user"]
+  O --> P["HistoryManager.record(t, buyer, seller)"]
+  P --> T
+
+  E_InvalidArg --> Z([End])
+  E_SubmitFail --> Z
+  E_InvalidState --> Z
+  E_Insufficient --> Z
+  I --> Z
+  Q --> Z
+
+  class E_InvalidArg,E_SubmitFail,E_InvalidState,E_Insufficient err
+  class Z ok

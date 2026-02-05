@@ -1,0 +1,9 @@
+flowchart TD
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B[Load next]
+  B --> C[Inc next]
+  C --> D[Return id]
+  D --> Z([End])
+
+  class Z ok

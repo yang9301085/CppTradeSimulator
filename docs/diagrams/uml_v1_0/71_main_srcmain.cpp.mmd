@@ -1,0 +1,17 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B[Init managers]
+  B --> C[Create TradeExecutor]
+  C --> D[Create accounts]
+  D --> E[Create order]
+  E --> F[Submit and process]
+  F --> G{Exception thrown?}
+  G -- Yes --> H[Print error and return 1]
+  G -- No --> I[Print OK and return 0]
+  H --> Z([End])
+  I --> Z
+
+  class H err
+  class Z ok

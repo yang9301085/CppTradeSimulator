@@ -1,0 +1,22 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Qty > 0?}
+  B -- No --> E_Invalid[Throw InvalidArg]
+  B -- Yes --> C{Symbol empty?}
+  C -- Yes --> E_Invalid
+  C -- No --> D[Find opposite order]
+  D --> E{Found?}
+  E -- No --> F[Add to book]
+  F --> G[Return empty]
+  G --> Z([End])
+  E -- Yes --> I[Make trade id]
+  I --> J[Pick qty and price]
+  J --> K[Update book]
+  K --> L[Return trades]
+  L --> Z
+  E_Invalid --> Z
+
+  class E_Invalid err
+  class Z ok

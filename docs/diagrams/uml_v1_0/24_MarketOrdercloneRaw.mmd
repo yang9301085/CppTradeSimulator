@@ -1,0 +1,14 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B[New MarketOrder]
+  B --> C{Alloc ok?}
+  C -- No --> E_BadAlloc[Throw BadAlloc]
+  C -- Yes --> D[Copy fields]
+  D --> E[Return raw]
+  E --> Z([End])
+  E_BadAlloc --> Z
+
+  class E_BadAlloc err
+  class Z ok

@@ -1,0 +1,16 @@
+flowchart TD
+  classDef err fill:#ffecec,stroke:#c00,color:#600
+  classDef ok fill:#eaffea,stroke:#0a0,color:#060
+
+  A([Start]) --> B{Id exists?}
+  B -- No --> E_NotFound[Throw NotFound]
+  B -- Yes --> C[Get status]
+  C --> D{Status Filled?}
+  D -- Yes --> E_Invalid[Throw InvalidState]
+  D -- No --> E[Set status Cancelled]
+  E --> Z([End])
+  E_NotFound --> Z
+  E_Invalid --> Z
+
+  class E_NotFound,E_Invalid err
+  class Z ok

@@ -1,18 +1,15 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
             "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
+                "_DEBUG"
             ],
-            "windowsSdkVersion": "10.0.26100.0",
-            "compilerPath": "F:/VS_2022/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64/cl.exe",
-            "intelliSenseMode": "windows-msvc-x64",
+            "compilerPath": "/usr/bin/clang++",
+            "intelliSenseMode": "macos-clang-arm64",
             "cStandard": "c17",
             "cppStandard": "c++17"
         }

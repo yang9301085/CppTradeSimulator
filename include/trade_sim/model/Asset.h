@@ -1,13 +1,14 @@
-/**
- * @file include/trade_sim/model/Asset.h
- * @brief Declare the Asset model (symbol, pricing, metadata).
- * @details
- * - Encapsulate static attributes and current price state.
- * - Keep business invariants documented here.
- * - No implementation code in this skeleton.
- */
 #pragma once
 
+#include <cstdint>
+#include <string>
+
 namespace trade_sim {
-// TODO: declarations
-}
+
+/** 持仓（struct 训练点） */
+struct Position {
+    std::string symbol;
+    std::int64_t qty{0}; // 可为负？这里先不支持做空，TODO：扩展
+};
+
+} // namespace trade_sim

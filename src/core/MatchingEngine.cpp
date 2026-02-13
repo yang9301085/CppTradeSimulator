@@ -1,10 +1,14 @@
-/**
- * @file src/core/MatchingEngine.cpp
- * @brief Implement matching logic for order books.
- * @details
- * - Implement price-time priority matching.
- * - Generate trade events for execution.
- * - No implementation code in this skeleton.
- */
 #include "trade_sim/core/MatchingEngine.h"
-// TODO: implement
+
+namespace trade_sim {
+
+std::vector<Trade> MatchingEngine::match(const Order& incoming) {
+    // TODO：实现撮合逻辑
+    // 建议 Iteration 1：先假装“总能成交”，成交价：
+    // - Market：用固定价或传入行情
+    // - Limit：用 limitPrice
+    (void)incoming;
+    return {};
+}
+
+} // namespace trade_sim

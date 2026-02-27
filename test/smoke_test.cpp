@@ -1,6 +1,8 @@
 #include "trade_sim/common/Exceptions.h"
 #include "trade_sim/core/AccountManager.h"
+#include "trade_sim/core/MatchingEngine.h"
 #include "trade_sim/order/OrderFactory.h"
+#include "trade_sim/order/Orders.h"
 
 #include <cassert>
 
@@ -54,6 +56,22 @@ int main() {
     auto ok = OrderFactory::createLimitOrder(4, "u1", "AAPL", Side::Buy, 10, Money(100));
     assert(ok);
     assert(ok->kind() == OrderKind::Limit);
+
+    // 5) matching: invalid qty -> InvalidArgumentException
+    MatchingEngine me;
+    thrown = false;
+    try {
+        LimitOrder badQty(5, "u1", "AAPL", Side::Buy, 0, Money(100));
+        (void)me.match(badQty);
+    } catch (const InvalidArgumentException&) {
+        thrown = true;
+    }
+    assert(thrown);
+
+    // 6) matching: valid order -> empty trades in minimal implementation
+    auto validForMatch = OrderFactory::createLimitOrder(6, "u1", "AAPL", Side::Buy, 10, Money(100));
+    auto trades = me.match(*validForMatch);
+    assert(trades.empty());
 
     return 0;
 }

@@ -1,6 +1,9 @@
 #include "trade_sim/common/Exceptions.h"
 #include "trade_sim/core/AccountManager.h"
+#include "trade_sim/core/HistoryManager.h"
 #include "trade_sim/core/MatchingEngine.h"
+#include "trade_sim/core/OrderManager.h"
+#include "trade_sim/core/TradeExecutor.h"
 #include "trade_sim/order/OrderFactory.h"
 #include "trade_sim/order/Orders.h"
 
@@ -72,6 +75,28 @@ int main() {
     auto validForMatch = OrderFactory::createLimitOrder(6, "u1", "AAPL", Side::Buy, 10, Money(100));
     auto trades = me.match(*validForMatch);
     assert(trades.empty());
+
+    // 7) TradeExecutor: null order -> InvalidArgumentException
+    AccountManager amExec;
+    OrderManager omExec;
+    MatchingEngine meExec;
+    HistoryManager hmExec;
+    TradeExecutor exec(amExec, omExec, meExec, hmExec);
+    thrown = false;
+    try {
+        exec.submitAndProcess(nullptr);
+    } catch (const InvalidArgumentException&) {
+        thrown = true;
+    }
+    assert(thrown);
+
+    // 8) TradeExecutor: valid order + no trades -> order stays Pending
+    amExec.createAccount("buyer", Money(100000));
+    auto pendingId = omExec.nextId();
+    auto pendingOrder = OrderFactory::createLimitOrder(pendingId, "buyer", "AAPL", Side::Buy, 1, Money(10000));
+    exec.submitAndProcess(std::move(pendingOrder));
+    assert(omExec.status(pendingId) == OrderStatus::Pending);
+    assert(hmExec.historyOf("buyer").empty());
 
     return 0;
 }
